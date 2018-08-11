@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd -P)"
+
+STACK_NAME="${STACK_NAME:-distillery-aws-example}"
+APP_NAME="${APP_NAME:-distillery-aws-example}"
+SSH_KEY_NAME="${SSH_KEY_NAME:-distillery-aws-example}"
+GITHUB_USER="${GITHUB_USER:-bitwalker}"
+GITHUB_REPO="${GITHUB_REPO:-distillery-aws-example}"
+GITHUB_TOKEN="$(cat "${SCRIPT_DIR}/../GITHUB_TOKEN" || "")"
+
+if [ -z "$GITHUB_USER" ]; then
+    echo "You must set GITHUB_USER!"
+    exit 1
+fi
+if [ -z "$GITHUB_REPO" ]; then
+    echo "You must set GITHUB_REPO!"
+    exit 1
+fi
+if [ -z "$GITHUB_TOKEN" ]; then
+    echo "You must set GITHUB_TOKEN!"
+    exit 1
+fi
+
+function validate_templates(){
+    echo "Validating $1.."
+    if ! aws cloudformation validate-template --template-body "file://$1"; then
+        exit 1
+    fi
+}
+
+function create_pipeline(){
+    aws cloudformation create-stack \
+        --stack-name "${STACK_NAME}" \
+        --template-body "file://${SCRIPT_DIR}/../templates/pipeline.yaml" \
+        --parameters "ParameterKey=ApplicationName,ParameterValue=${APP_NAME}" \
+                     "ParameterKey=SSHKeyName,ParameterValue=${SSH_KEY_NAME}" \
+                     "ParameterKey=GitHubUser,ParameterValue=${GITHUB_USER}" \
+                     "ParameterKey=GitHubRepository,ParameterValue=${GITHUB_REPO}" \
+                     "ParameterKey=GitHubOAuthToken,ParameterValue=${GITHUB_TOKEN}" \
+        --capabilities "CAPABILITY_NAMED_IAM" \
+        --on-failure "DO_NOTHING" \
+        --tags "Key=source,Value=${APP_NAME}" \
+               "Key=stack,Value=${STACK_NAME}" | jq '.StackId' --raw-output
+}
+
+function bucket_arns(){
+    aws resourcegroupstaggingapi get-resources \
+        --resource-type-filters="s3" \
+        --tag-filters="Key=stack,Values=${STACK_NAME}" | \
+    jq '.ResourceTagMappingList[].ResourceARN' --raw-output
+}
+
+function disable_bucket_versioning(){
+    aws s3api put-bucket-versioning --versioning-configuration="Status=Suspended" --bucket "$1"
+}
+
+function delete_bucket_versions(){
+    aws s3api list-object-versions --bucket="$1" |\
+        jq '.Versions[], .DeleteMarkers[] | "\"\(.Key)\" \"\(.VersionId)\""' --raw-output |\
+        awk -v bucket="$1" '{ \
+          print "aws s3api delete-object", \
+              "--bucket=\"" bucket "\"", \
+              "--key=\"" $1 "\"", \
+              "--version-id=\"" $2 "\"" \
+          | "/bin/sh >/dev/null"; \
+          print "Deleted version " $2 "of " $1 " successfully"; \
+         }'
+}
+
+function delete_bucket(){
+    aws s3 rb --force "$1"
+}
+
+function delete_stack(){
+    aws cloudformation delete-stack \
+        --stack-name="${STACK_NAME}" | \
+    jq '.StackId' --raw-output
+}
+
+function destroy_resources(){
+    arns="$(bucket_arns)"
+    for arn in "$arns"; do
+        disable_bucket_versioning "$arn"
+        delete_bucket_versions "$arn"
+        delete_bucket "$arn"
+    done
+    # Delete stack
+    stack_id="$(delete_stack)"
+    # Wait for deletion to complete
+    aws cloudformation wait stack-delete-complete \
+        --stack-name="${stack_id}"
+    # Delete log groups
+    aws logs describe-log-groups \
+        --log-group-name-prefix="/aws/lambda/${APP_NAME}" | \
+    jq '.logGroups[].logGroupName' --raw-output | \
+    xargs -n1 aws logs delete-log-group --log-group-name
+}
+
+function estimate_cost(){
+    aws cloudformation estimate-template-cost \
+        --template-body "file://$1" \
+        --parameters "ParameterKey=ApplicationName,ParameterValue=${APP_NAME}" \
+                     "ParameterKey=SSHKeyName,ParameterValue=${SSH_KEY_NAME}" \
+                     "ParameterKey=GitHubUser,ParameterValue=${GITHUB_USER}" \
+                     "ParameterKey=GitHubRepository,ParameterValue=${GITHUB_REPO}" \
+                     "ParameterKey=GitHubOAuthToken,ParameterValue=${GITHUB_TOKEN}"
+}
+
+if [ -z "$1" ]; then
+    echo "Expected a command to run!"
+    exit 2
+fi
+
+CMD="$1"
+shift
+
+case $CMD in
+    create)
+        stack_id="$(create_pipeline "$@")"
+        aws cloudformation wait stack-create-complete --stack-name="${stack_id}"
+        ;;
+    destroy)
+        destroy_resources "$@"
+        ;;
+    validate)
+        validate_templates "$@"
+        ;;
+    estimate)
+        estimate_cost "$@"
+        ;;
+    *)
+        echo "Invalid command (create|destroy|validate|estimate): $1"
+        exit 2
+esac

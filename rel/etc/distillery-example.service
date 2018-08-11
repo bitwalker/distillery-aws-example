@@ -1,0 +1,21 @@
+[Unit]
+Description=Service unit for the distillery-example application
+Requires=setup-network-environment.service
+After=setup-network-environment.service
+
+[Service]
+WorkingDirectory=/opt/app
+EnvironmentFile=/etc/network-environment
+EnvironmentFile=/opt/app/etc/environment
+StandardOutput=journal
+StandardError=journal
+User=ec2-user
+ExecStart=/opt/app/bin/distillery_example foreground
+KillMode=process
+TimeoutStopSec=60
+Restart=on-failure
+RestartSec=5
+RemainAfterExit=no
+
+[Install]
+WantedBy=multi-user.target

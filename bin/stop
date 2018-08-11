@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -e
+
+if systemctl is-active distillery-example.service; then
+    systemctl stop distillery-example.service
+fi
+
+exit 0
