@@ -23,7 +23,8 @@ artifacts:
   files:
     - distillery_example.tar.gz
     - appspec.yml
-    - templates
+    - templates/infra.yml
+    - templates/production.conf
     - bin/unpack
     - bin/stop
     - bin/migrate
