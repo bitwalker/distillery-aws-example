@@ -7,9 +7,12 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd -P)"
 STACK_NAME="${STACK_NAME:-distillery-aws-example}"
 APP_NAME="${APP_NAME:-distillery-aws-example}"
 SSH_KEY_NAME="${SSH_KEY_NAME:-distillery-aws-example}"
-GITHUB_USER="${GITHUB_USER:-bitwalker}"
-GITHUB_REPO="${GITHUB_REPO:-distillery-aws-example}"
 GITHUB_TOKEN="$(cat "${SCRIPT_DIR}/../GITHUB_TOKEN" || "")"
+
+GIT_URL="$(grep 'url' .git/config | awk '{ print $3 }')"
+REPO_NAME="$(echo "$GIT_URL" | sed -e 's|https://github.com/||' -e 's|git@github.com:||' -e 's|.git$||')"
+GITHUB_USER="$(echo "$REPO_NAME" | cut -d'/' -f1)"
+GITHUB_REPO="$(echo "$REPO_NAME" | cut -d'/' -f2)"
 
 if [ -z "$GITHUB_USER" ]; then
     echo "You must set GITHUB_USER!"
