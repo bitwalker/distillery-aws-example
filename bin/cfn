@@ -99,16 +99,6 @@ function destroy_resources(){
     xargs -n1 aws logs delete-log-group --log-group-name
 }
 
-function estimate_cost(){
-    aws cloudformation estimate-template-cost \
-        --template-body "file://$1" \
-        --parameters "ParameterKey=ApplicationName,ParameterValue=${APP_NAME}" \
-                     "ParameterKey=SSHKeyName,ParameterValue=${SSH_KEY_NAME}" \
-                     "ParameterKey=GitHubUser,ParameterValue=${GITHUB_USER}" \
-                     "ParameterKey=GitHubRepository,ParameterValue=${GITHUB_REPO}" \
-                     "ParameterKey=GitHubOAuthToken,ParameterValue=${GITHUB_TOKEN}"
-}
-
 if [ -z "$1" ]; then
     echo "Expected a command to run!"
     exit 2
@@ -128,10 +118,7 @@ case $CMD in
     validate)
         validate_templates "$@"
         ;;
-    estimate)
-        estimate_cost "$@"
-        ;;
     *)
-        echo "Invalid command (create|destroy|validate|estimate): $1"
+        echo "Invalid command (create|destroy|validate): $1"
         exit 2
 esac
