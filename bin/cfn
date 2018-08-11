@@ -116,13 +116,18 @@ shift
 case $CMD in
     create)
         stack_id="$(create_pipeline "$@")"
+        echo "Stack ${stack_id} is being created, waiting for completion.."
         aws cloudformation wait stack-create-complete --stack-name="${stack_id}"
+        echo "Successfully created stack ${stack_id}!"
+        exit 0
         ;;
     destroy)
         destroy_resources "$@"
+        exit $?
         ;;
     validate)
         validate_templates "$@"
+        exit $?
         ;;
     *)
         echo "Invalid command (create|destroy|validate): $1"
