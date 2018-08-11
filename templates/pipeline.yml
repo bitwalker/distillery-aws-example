@@ -2,9 +2,7 @@ Description: >
 
   This template creates a continuous deployment pipeline which pulls
   code from GitHub, builds via CodeBuild, and deploys via CloudFormation.
-  CodePipeline orchestrates this process. It also creates some requisite
-  objects which are used by the deployed infrastructure (S3 buckets for
-  builds and config, and IAM roles/policies for instances)
+  CodePipeline orchestrates this process.
 
 Parameters:
   ApplicationName: 
@@ -65,7 +63,7 @@ Metadata:
 
 Resources:
   
-  # S3 Buckets
+  # S3 bucket for build artifacts
 
   S3BucketBuilds:
     Type: AWS::S3::Bucket
@@ -83,31 +81,6 @@ Resources:
         - Key: source
           Value: !Ref ApplicationName
 
-  # IAM
-  
-  InstanceRole:
-    Type: AWS::IAM::Role
-    Properties: 
-      Path: /
-      RoleName: !Sub "${ApplicationName}-${AWS::Region}"
-      AssumeRolePolicyDocument:
-        Statement:
-          - Effect: "Allow"
-            Principal:
-              Service: "ec2.amazonaws.com"
-            Action:
-              - "sts:AssumeRole"
-      ManagedPolicyArns:
-        - "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforAWSCodeDeploy"
-        - "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
-  
-  InstanceProfile: 
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      Path: /
-      Roles: 
-        - !Ref InstanceRole
-        
   # CodePipeline/CodeBuild/CodeDeploy
 
   CodePipeline:
@@ -344,15 +317,3 @@ Outputs:
     Value: !GetAtt CodeDeployServiceRole.Arn
     Export:
       Name: !Sub "CodeDeployServiceRoleArn-${ApplicationName}"
-        
-  InstanceProfileArn:
-    Description: "The ARN of the instance profile applied to EC2 hosts"
-    Value: !GetAtt InstanceProfile.Arn
-    Export:
-      Name: !Sub "InstanceProfileArn-${ApplicationName}"
-      
-  InstanceRoleArn:
-    Description: "The ARN of the instance role applied to EC2 hosts"
-    Value: !GetAtt InstanceRole.Arn
-    Export:
-      Name: !Sub "InstanceRoleArn-${ApplicationName}"

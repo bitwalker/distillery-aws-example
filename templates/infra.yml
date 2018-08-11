@@ -13,7 +13,7 @@ Parameters:
     Description: "The environment this stack represents"
     Type: String
         
-  # Overridden using infra.conf per-environment
+  # Overridden using templates/<env>.conf per-environment
   
   DatabaseName:
     Description: "The name of the database to use"
@@ -234,8 +234,7 @@ Resources:
           - Sid: "Allow EC2 instances to decrypt with this key"
             Effect: "Allow"
             Principal:
-              AWS:
-                Fn::ImportValue: !Sub "InstanceRoleArn-${ApplicationName}"
+              AWS: !GetAtt InstanceRole.Arn
             Resource: "*"
             Action:
               - "kms:Decrypt"
@@ -693,8 +692,7 @@ Resources:
       ImageId: !FindInMap [AWSRegionToAMI, !Ref "AWS::Region", AMI]
       InstanceType: t2.micro
       KeyName: !Ref SSHKeyName
-      IamInstanceProfile: 
-        Fn::ImportValue: !Sub "InstanceProfileArn-${ApplicationName}"
+      IamInstanceProfile: !GetAtt InstanceProfile.Arn
       AssociatePublicIpAddress: true
       UserData:
         Fn::Base64: !Sub |
@@ -792,6 +790,31 @@ Resources:
                 chmod +x ./install
                 ./install auto
 
+  # IAM role for EC2 instances
+  
+  InstanceRole:
+    Type: AWS::IAM::Role
+    Properties: 
+      Path: /
+      RoleName: !Sub "${ApplicationName}-${EnvironmentName}-${AWS::Region}"
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforAWSCodeDeploy"
+        - "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
+  
+  InstanceProfile: 
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles: 
+        - !Ref InstanceRole
+ 
   # RDS Database
 
   Database:
