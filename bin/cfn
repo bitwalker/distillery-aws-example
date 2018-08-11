@@ -40,7 +40,7 @@ function validate_templates(){
 function create_pipeline(){
     aws cloudformation create-stack \
         --stack-name "${STACK_NAME}" \
-        --template-body "file://${SCRIPT_DIR}/../templates/pipeline.yaml" \
+        --template-body "file://${SCRIPT_DIR}/../templates/pipeline.yml" \
         --parameters "ParameterKey=ApplicationName,ParameterValue=${APP_NAME}" \
                      "ParameterKey=SSHKeyName,ParameterValue=${SSH_KEY_NAME}" \
                      "ParameterKey=GitHubUser,ParameterValue=${GITHUB_USER}" \
