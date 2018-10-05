@@ -95,6 +95,7 @@ Resources:
           import random
           import uuid
           import logging
+          import re
           
           logger = logging.getLogger()
           
@@ -147,7 +148,8 @@ Resources:
               return True
               
           def generate_secret(n):
-              chars = string.ascii_uppercase + string.ascii_lowercase + string.digits + string.punctuation
+              allowed_punctuation = re.sub('[@"/]', '', string.punctuation)
+              chars = string.ascii_uppercase + string.ascii_lowercase + string.digits + allowed_punctuation
               return ''.join(random.choice(chars) for x in range(int(n)))
           
           def handler(event, context):

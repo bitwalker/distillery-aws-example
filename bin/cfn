@@ -113,7 +113,7 @@ function tail_stack() {
     local previous
     until echo "$current" | tail -1 | grep -E -q "${stack}.*_(COMPLETE|FAILED)"
     do
-        if ! output=$(stack-events "${stack}"); then
+        if ! output=$(stack_events "${stack}"); then
             # Something went wrong with stack-events (like stack not known)
             return 1
         fi
