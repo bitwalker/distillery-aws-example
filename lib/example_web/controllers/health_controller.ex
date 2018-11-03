@@ -6,7 +6,7 @@ defmodule ExampleWeb.HealthController do
     if Example.Database.available?() do
       healthy(conn)
     else
-      degraded(conn, [database: :unavailable])
+      degraded(conn, %{database: :unavailable})
     end
   rescue
     err ->
