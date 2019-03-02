@@ -10,7 +10,7 @@ defmodule Example.Tasks.Migrate do
 
     # Start requisite apps
     IO.puts "==> Starting applications.."
-    for app <- [:crypto, :ssl, :postgrex, :ecto] do
+    for app <- [:crypto, :ssl, :postgrex, :ecto, :ecto_sql] do
       {:ok, res} = Application.ensure_all_started(app)
       IO.puts "==> Started #{app}: #{inspect res}"
     end
