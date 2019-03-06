@@ -14,13 +14,13 @@ defmodule ExampleWeb.HealthController do
   end
 
   defp healthy(conn) do 
-    status = %{status: :ok}
+    status = %{status: :ok, nodes: Node.list()}
     Logger.info "Health check good: #{inspect status}"
     json(conn, status)
   end
 
   defp degraded(conn, services) do
-    status = %{status: :degraded, services: services}
+    status = %{status: :degraded, services: services, nodes: Node.list()}
     Logger.warn "Health check degraded: #{inspect status}"
     conn
     |> put_resp_content_type("application/json")

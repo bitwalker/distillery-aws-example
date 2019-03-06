@@ -547,6 +547,18 @@ Resources:
       FromPort: '4000'
       ToPort: '4000'
 
+  SecurityGroupAppIngressErlDist:
+    Type: AWS::EC2::SecurityGroupIngress
+    Description: "Allow Erlang Distribution to communicate between application nodes"
+    Properties:
+        SourceSecurityGroupId: !GetAtt SecurityGroupApp.GroupId
+        SourceSecurityGroupOwnerId: !Ref "AWS::AccountId"
+        GroupId: !GetAtt SecurityGroupApp.GroupId
+        IpProtocol: tcp
+        # This range covers up to 100 nodes, tweak as needed
+        FromPort: '4369'
+        ToPort: '4470'
+
   SecurityGroupALBIngressPublicHTTP:
     Type: AWS::EC2::SecurityGroupIngress
     Description: "Allow any HTTP traffic on port 80 to ALBs"
@@ -806,6 +818,14 @@ Resources:
               Service: "ec2.amazonaws.com"
             Action:
               - "sts:AssumeRole"
+      Policies:
+        - PolicyName: "DescribeInstancesPolicy"
+          PolicyDocument:
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "ec2:DescribeInstances"
+                Resource: "*"
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforAWSCodeDeploy"
         - "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"

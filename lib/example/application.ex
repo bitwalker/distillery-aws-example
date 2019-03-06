@@ -5,6 +5,7 @@ defmodule Example.Application do
     import Supervisor.Spec
 
     children = [
+      supervisor(Cluster.Supervisor, [topologies, [name: Example.ClusterSupervisor]]),
       supervisor(Example.Database, []),
       supervisor(ExampleWeb.Endpoint, []),
     ]

@@ -4,3 +4,7 @@
 
 # Use cookie from vm.args
 -setcookie <%= release.profile.cookie %>
+
+# Set distribution protocol port range
+-kernel inet_dist_listen_min 4370
+-kernel inet_dist_listen_max 4470
