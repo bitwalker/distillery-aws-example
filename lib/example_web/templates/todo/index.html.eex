@@ -30,11 +30,11 @@
   <p>Refactored by <a href="https://github.com/cburgmer">Christoph Burgmer</a></p>
   <p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
 </footer>
-<script src="<%= static_path(@conn, "/js/base.js") %>"></script>
-<script src="<%= static_path(@conn, "/js/helpers.js") %>"></script>
-<script src="<%= static_path(@conn, "/js/store.js") %>"></script>
-<script src="<%= static_path(@conn, "/js/model.js") %>"></script>
-<script src="<%= static_path(@conn, "/js/template.js") %>"></script>
-<script src="<%= static_path(@conn, "/js/view.js") %>"></script>
-<script src="<%= static_path(@conn, "/js/controller.js") %>"></script>
-<script src="<%= static_path(@conn, "/js/app.js") %>"></script>
+<script src="<%= Routes.static_path(@conn, "/js/base.js") %>"></script>
+<script src="<%= Routes.static_path(@conn, "/js/helpers.js") %>"></script>
+<script src="<%= Routes.static_path(@conn, "/js/store.js") %>"></script>
+<script src="<%= Routes.static_path(@conn, "/js/model.js") %>"></script>
+<script src="<%= Routes.static_path(@conn, "/js/template.js") %>"></script>
+<script src="<%= Routes.static_path(@conn, "/js/view.js") %>"></script>
+<script src="<%= Routes.static_path(@conn, "/js/controller.js") %>"></script>
+<script src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>

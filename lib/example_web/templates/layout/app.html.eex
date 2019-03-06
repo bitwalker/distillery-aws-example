@@ -8,8 +8,8 @@
     <meta name="author" content="">
 
     <title>Example App - Todos</title>
-    <link rel="stylesheet" href="<%= static_path(@conn, "/css/base.css") %>">
-    <link rel="stylesheet" href="<%= static_path(@conn, "/css/index.css") %>">
+    <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/base.css") %>">
+    <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/index.css") %>">
   </head>
 
   <body>

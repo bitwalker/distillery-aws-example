@@ -21,8 +21,9 @@ defmodule ExampleWeb do
     quote do
       use Phoenix.Controller, namespace: ExampleWeb
       import Plug.Conn
-      import ExampleWeb.Router.Helpers
       import ExampleWeb.Gettext
+
+      alias ExampleWeb.Router.Helpers, as: Routes
     end
   end
 
@@ -36,9 +37,10 @@ defmodule ExampleWeb do
 
       use Phoenix.HTML
 
-      import ExampleWeb.Router.Helpers
       import ExampleWeb.ErrorHelpers
       import ExampleWeb.Gettext
+
+      alias ExampleWeb.Router.Helpers, as: Routes
     end
   end
 
