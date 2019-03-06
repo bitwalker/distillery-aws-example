@@ -6,7 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd -P)"
 
 STACK_NAME="${STACK_NAME:-distillery-aws-example}"
 APP_NAME="${APP_NAME:-distillery-aws-example}"
-GITHUB_TOKEN="$(cat "${SCRIPT_DIR}/../GITHUB_TOKEN" || "")"
+GITHUB_TOKEN="$GITHUB_TOKEN"
 
 GIT_URL="$(grep 'url' .git/config | awk '{ print $3 }')"
 REPO_NAME="$(echo "$GIT_URL" | sed -e 's|https://github.com/||' -e 's|git@github.com:||' -e 's|.git$||')"
