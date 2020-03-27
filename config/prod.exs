@@ -6,7 +6,8 @@ config :distillery_example, ExampleWeb.Endpoint,
   version: Application.spec(:distillery_example, :vsn)
 
 config :distillery_example,
-  ecto_repos: [Example.Repo]
+  ecto_repos: [Example.Repo],
+  pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
 
 config :logger,
   level: :info,

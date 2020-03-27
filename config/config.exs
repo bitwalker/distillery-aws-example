@@ -14,8 +14,7 @@ config :distillery_example, ExampleWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "WLTAq0m3cyhaqufuub/5RyX8E8/s2UR2P1cVJVWn0d46GixiKO6yaTa6i8B8jbzS",
   render_errors: [view: ExampleWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: Example.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: Example.PubSub, adapter: Phoenix.PubSub.PG2]
 
 config :phoenix, :json_library, Jason
 
@@ -34,4 +33,4 @@ config :libcluster,
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
-import_config "#{Mix.env}.exs"
+import_config "#{Mix.env()}.exs"
