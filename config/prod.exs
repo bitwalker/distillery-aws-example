@@ -5,7 +5,8 @@ config :distillery_example, ExampleWeb.Endpoint,
   cache_static_manifest: "priv/static/cache_manifest.json",
   version: Application.spec(:distillery_example, :vsn)
 
-config :distillery_example, Example.Repo
+config :distillery_example,
+  ecto_repos: [Example.Repo]
 
 config :logger,
   level: :info,
