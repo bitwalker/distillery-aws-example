@@ -31,7 +31,7 @@ environment :prod do
   # We use an extra config evaluated solely at runtime
   set(
     config_providers: [
-      {Mix.Releases.Config.Providers.Elixir, ["${RELEASE_ROOT_DIR}/etc/config.exs"]}
+      {Distillery.Releases.Config.Providers.Elixir, ["${RELEASE_ROOT_DIR}/etc/config.exs"]}
     ]
   )
 
