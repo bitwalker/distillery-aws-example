@@ -18,7 +18,7 @@ defmodule Example.Tasks.Migrate do
 
     # Start the repo
     IO.puts("==> Starting repo")
-    {:ok, _pid} = Example.Repo.start_link(pool_size: 1, log: true, log_sql: true)
+    {:ok, _pid} = Example.Repo.start_link(pool_size: 1, log: :info, log_sql: true)
 
     # Run the migrations for the repo
     IO.puts("==> Running migrations")
