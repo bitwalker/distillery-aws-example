@@ -12,7 +12,6 @@ defmodule Example.Repo do
       opts
       |> Keyword.put(:url, System.get_env("DATABASE_URL"))
       |> Keyword.put(:hostname, System.get_env("DATABASE_HOST"))
-      |> Keyword.put(:show_sensitive_data_on_connection_error, true)
 
     {:ok, opts}
   end
