@@ -13,6 +13,15 @@ REPO_NAME="$(echo "$GIT_URL" | sed -e 's|https://github.com/||' -e 's|git@github
 GITHUB_USER="$(echo "$REPO_NAME" | cut -d'/' -f1)"
 GITHUB_REPO="$(echo "$REPO_NAME" | cut -d'/' -f2)"
 
+#echo "DEMO APP :: Starting Stack Creation With..."
+#echo "STACK_NAME = $STACK_NAME"
+#echo "APP_NAME = $APP_NAME"
+#echo "GITHUB_TOKEN = $GITHUB_TOKEN"
+#echo "GIT_URL = $GIT_URL"
+#echo "REPO_NAME = $REPO_NAME"
+#echo "GITHUB_USER = $GITHUB_USER"
+#echo "GITHUB_REPO = $GITHUB_REPO"
+
 if [ -z "$GITHUB_USER" ]; then
     echo "You must set GITHUB_USER!"
     exit 1
