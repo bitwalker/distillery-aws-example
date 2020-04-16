@@ -7,7 +7,7 @@ if [ ! -z "$BUILD_DIR" ]; then
 fi
 
 ERL_VERSION="21.0"
-ELIXIR_VERSION="1.6"
+ELIXIR_VERSION="1.6.0"
 
 export LANG=en_US.UTF-8
 export LANGUAGE=en_US
