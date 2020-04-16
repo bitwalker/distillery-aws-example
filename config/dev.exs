@@ -47,8 +47,10 @@ config :phoenix, :stacktrace_depth, 20
 # Configure your database
 {username, 0} = System.cmd("whoami", [])
 config :distillery_example, Example.Repo,
-  adapter: Ecto.Adapters.Postgres,
   username: String.trim(username),
+  password: "",
   database: "distillery_example_dev",
   hostname: "localhost",
+  show_sensitive_data_on_connection_error: true,
+  socket_dir: "/tmp",
   pool_size: 10

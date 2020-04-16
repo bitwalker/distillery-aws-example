@@ -4,11 +4,15 @@ defmodule Example.Application do
   def start(_type, _args) do
     import Supervisor.Spec
 
-    children = [
-      supervisor(Cluster.Supervisor, [topologies, [name: Example.ClusterSupervisor]]),
+    children =
+    [
       supervisor(Example.Database, []),
-      supervisor(ExampleWeb.Endpoint, []),
-    ]
+      supervisor(ExampleWeb.Endpoint, [])
+    ] ++
+      case Application.get_env(:libcluster, :topologies) do
+        nil -> []
+        topologies -> [{Cluster.Supervisor, [topologies, [name: Example.ClusterSupervisor]]}]
+      end
 
     opts = [strategy: :one_for_one, name: Example.Supervisor]
     Supervisor.start_link(children, opts)
