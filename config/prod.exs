@@ -10,6 +10,6 @@ config :distillery_example, Example.Repo,
 
 config :logger,
   level: :info,
-  handle_sasl_reports: true,
-  handle_otp_reports: true
+  handle_sasl_reports: false,
+  handle_otp_reports: false
 
