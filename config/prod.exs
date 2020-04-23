@@ -8,8 +8,4 @@ config :distillery_example, ExampleWeb.Endpoint,
 config :distillery_example, Example.Repo,
   adapter: Ecto.Adapters.Postgres
 
-config :logger,
-  level: :info,
-  handle_sasl_reports: false,
-  handle_otp_reports: false
-
+config :logger, level: :info
