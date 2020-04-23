@@ -7,7 +7,6 @@ config :distillery_example, ExampleWeb.Endpoint,
   server: false
 
 # Print only warnings and errors during test
-config :logger, level: :warn
 
 # Configure your database
 config :distillery_example, Example.Repo,

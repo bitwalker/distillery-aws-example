@@ -8,4 +8,3 @@ config :distillery_example, ExampleWeb.Endpoint,
 config :distillery_example, Example.Repo,
   adapter: Ecto.Adapters.Postgres
 
-config :logger, level: :info

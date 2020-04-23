@@ -19,9 +19,6 @@ config :distillery_example, ExampleWeb.Endpoint,
 
 config :phoenix, :json_library, Jason
 
-# Configures Elixir's Logger
-config :logger, level: :info
-
 config :libcluster,
   topologies: [
     example: [
