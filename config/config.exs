@@ -20,9 +20,7 @@ config :distillery_example, ExampleWeb.Endpoint,
 config :phoenix, :json_library, Jason
 
 # Configures Elixir's Logger
-config :logger, :console,
-  format: "$time $metadata[$level] $message\n",
-  metadata: [:user_id]
+config :logger, level: :info
 
 config :libcluster,
   topologies: [
