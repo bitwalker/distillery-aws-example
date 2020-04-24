@@ -4,17 +4,17 @@ Description: >
 Parameters:
   # Set automatically by CodePipeline
 
-  ApplicationName: 
+  ApplicationName:
     Description: "This will be used to name the pipeline and build resources"
     Type: String
     AllowedPattern: '[A-Za-z0-9-]+'
-  
+
   EnvironmentName:
     Description: "The environment this stack represents"
     Type: String
-        
+
   # Overridden using templates/<env>.conf per-environment
-  
+
   DatabaseName:
     Description: "The name of the database to use"
     Type: String
@@ -24,12 +24,12 @@ Parameters:
     Description: "The name of the user to use when connecting to the database"
     Type: String
     AllowedPattern: '[A-Za-z0-9-]+'
-    
+
   SSHKeyName:
     Description: "The name of the SSH keypair to use for connecting to EC2 hosts"
     Type: AWS::EC2::KeyPair::KeyName
-    
-Mappings: 
+
+Mappings:
   # Amazon Linux 2 AMI 20180622.1
   # amzn2-ami-hvm-2.0.20180622.1-x86_64-gp2
   # https://aws.amazon.com/amazon-linux-ami/
@@ -67,14 +67,14 @@ Mappings:
 
 Resources:
   # A little hack to support secret storage in SSM
-  
+
   SecretDatabasePassword:
     Type: Custom::Secret
     Properties:
       Name: !Sub "/${ApplicationName}/${EnvironmentName}/database/password"
       KMSKeyId: !Ref EncryptionKey
       ServiceToken: !GetAtt CustomResource.Arn
-      
+
   CustomResource:
     Type: AWS::Lambda::Function
     Properties:
@@ -96,9 +96,9 @@ Resources:
           import uuid
           import logging
           import re
-          
+
           logger = logging.getLogger()
-          
+
           def create_secret(client, props):
               if has_keys(props, ['Name', 'KMSKeyId']):
                   name = props['Name']
@@ -140,18 +140,18 @@ Resources:
               else:
                   logger.error('missing required params, one of [Name]: {}'.format(props))
                   return cfnresponse.FAILED
-          
+
           def has_keys(props, keys):
               for key in keys:
                   if not key in props.keys():
                     return False
               return True
-              
+
           def generate_secret(n):
               allowed_punctuation = re.sub('[@"/]', '', string.punctuation)
               chars = string.ascii_uppercase + string.ascii_lowercase + string.digits + allowed_punctuation
               return ''.join(random.choice(chars) for x in range(int(n)))
-          
+
           def handler(event, context):
               try:
                   props = event['ResourceProperties']
@@ -169,14 +169,14 @@ Resources:
                       status = delete_secret(client, props)
                   else:
                       logger.error('Unexpected RequestType: {}'.format(event_type))
-                  
+
                   # If a PhysicalResourceId has not been given to our resource, create one
                   prid = ''
                   if 'PhysicalResourceId' in event:
                     prid = event['PhysicalResourceId']
                   else:
                     prid = str(uuid.uuid4())
-              
+
                   # Send response back to CloudFormation
                   if status == cfnresponse.FAILED:
                     cfnresponse.send(event, context, status, {})
@@ -189,7 +189,7 @@ Resources:
                   logger.exception('Unexpected error in handler')
                   cfnresponse.send(event, context, cfnresponse.FAILED, {})
               return
-    
+
   CustomResourceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -253,7 +253,7 @@ Resources:
       Tags:
         - Key: source
           Value: !Ref ApplicationName
-  
+
   EncryptionKeyAlias:
     Type: AWS::KMS::Alias
     Properties:
@@ -271,7 +271,7 @@ Resources:
           VPCRegion: !Ref "AWS::Region"
       HostedZoneConfig:
         Comment: !Sub "Internal DNS for ${ApplicationName}"
-        
+
   DatabaseInternalDNS:
     Type: AWS::Route53::RecordSet
     Properties:
@@ -281,7 +281,7 @@ Resources:
       TTL: "300"
       ResourceRecords:
         - !Sub "${Database.Endpoint.Address}"
-        
+
   # VPC
 
   VPC:
@@ -314,7 +314,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       CidrBlock: 10.0.0.0/24
-      AvailabilityZone: 
+      AvailabilityZone:
         Fn::Select:
           - 0
           - Fn::GetAZs: !Ref "AWS::Region"
@@ -436,7 +436,7 @@ Resources:
           Value: !Sub "${ApplicationName}-network-acls"
         - Key: source
           Value: !Ref ApplicationName
-          
+
   NetworkACLEntry1:
     Type: AWS::EC2::NetworkAclEntry
     Properties:
@@ -473,13 +473,13 @@ Resources:
     Properties:
       NetworkAclId: !Ref NetworkACL
       SubnetId: !Ref SubnetDatabaseA
-  
+
   NetworkACLSubnetDatabaseB:
     Type: AWS::EC2::SubnetNetworkAclAssociation
     Properties:
       NetworkAclId: !Ref NetworkACL
       SubnetId: !Ref SubnetDatabaseB
-  
+
   # Security Groups
 
   SecurityGroupApp:
@@ -587,7 +587,7 @@ Resources:
       CidrIp: 0.0.0.0/0
       GroupId: !GetAtt SecurityGroupDatabase.GroupId
       IpProtocol: '-1'
-  
+
   SecurityGroupAppEgressAll:
     Type: AWS::EC2::SecurityGroupEgress
     Description: "Allow all outbound traffic from the application security group"
@@ -603,10 +603,10 @@ Resources:
       CidrIp: 0.0.0.0/0
       GroupId: !GetAtt SecurityGroupALB.GroupId
       IpProtocol: '-1'
-      
-  
+
+
   # Load Balancer
-  
+
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
@@ -621,7 +621,7 @@ Resources:
       Tags:
         - Key: source
           Value: !Ref ApplicationName
-  
+
   TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
@@ -647,7 +647,7 @@ Resources:
       Tags:
         - Key: source
           Value: !Ref ApplicationName
-        
+
   LoadBalancerHTTPListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
@@ -659,7 +659,7 @@ Resources:
         LoadBalancerArn: !Ref LoadBalancer
 
   # Autoscaling Group
-  
+
   ASG:
     Type: AWS::AutoScaling::AutoScalingGroup
     DependsOn: InternetGatewayAttachment
@@ -805,10 +805,10 @@ Resources:
                 ./install auto
 
   # IAM role for EC2 instances
-  
+
   InstanceRole:
     Type: AWS::IAM::Role
-    Properties: 
+    Properties:
       Path: /
       RoleName: !Sub "${ApplicationName}-${EnvironmentName}-${AWS::Region}"
       AssumeRolePolicyDocument:
@@ -829,14 +829,14 @@ Resources:
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforAWSCodeDeploy"
         - "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
-  
-  InstanceProfile: 
+
+  InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Path: /
-      Roles: 
+      Roles:
         - !Ref InstanceRole
- 
+
   # RDS Database
 
   Database:
@@ -853,7 +853,7 @@ Resources:
       MasterUserPassword: !GetAtt SecretDatabasePassword.Value
       DBName: !Ref DatabaseName
       Engine: postgres
-      EngineVersion: 9.6.6
+      EngineVersion: 10.11
       LicenseModel: postgresql-license
       DBSubnetGroupName: !Ref DBSubnetGroup
       VPCSecurityGroups:
@@ -863,7 +863,7 @@ Resources:
           Value: other
         - Key: source
           Value: !Ref ApplicationName
-          
+
   DBSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
@@ -874,19 +874,19 @@ Resources:
       Tags:
         - Key: source
           Value: !Ref ApplicationName
-          
+
   CodeDeployDeploymentGroup:
     Type: AWS::CodeDeploy::DeploymentGroup
     Properties:
       DeploymentGroupName: !Sub "${ApplicationName}-${EnvironmentName}"
-      ApplicationName: 
+      ApplicationName:
         Fn::ImportValue: !Sub "CodeDeployApplication-${ApplicationName}"
-      ServiceRoleArn: 
+      ServiceRoleArn:
         Fn::ImportValue: !Sub "CodeDeployServiceRoleArn-${ApplicationName}"
       AutoScalingGroups:
         - !Ref ASG
 
 Outputs:
-    WebsiteURL: 
+    WebsiteURL:
         Description: "The URL to access the running application once it is deployed"
         Value: !Sub "http://${LoadBalancer.DNSName}"

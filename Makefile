@@ -19,7 +19,7 @@ compile: ## Build the application
 clean: ## Clean up generated artifacts
 	mix clean
 
-rebuild: clean build ## Rebuild the application
+rebuild: clean release ## Rebuild the application
 
 image: ## Mimic CodeBuild build
 	docker run --rm -e BUILD_DIR=/opt/app -v $(PWD):/opt/app -it centos:7 /opt/app/bin/build all
@@ -27,5 +27,5 @@ image: ## Mimic CodeBuild build
 release: ## Build a release of the application with MIX_ENV=prod
 	MIX_ENV=prod mix do deps.get, compile
 	MIX_ENV=prod mix phx.digest
-	MIX_ENV=prod mix release --verbose
+	MIX_ENV=prod mix distillery.release
 	@cp _build/prod/rel/$(IMAGE_NAME)/releases/$(VERSION)/$(IMAGE_NAME).tar.gz $(IMAGE_NAME).tar.gz
