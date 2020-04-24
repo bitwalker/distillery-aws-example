@@ -5,6 +5,11 @@
 # is restricted to this project.
 use Mix.Config
 
+# Configures Elixir's Logger
+config :logger, :console,
+  format: "$time $metadata[$level] $message\n",
+  metadata: [:user_id]
+
 # General application configuration
 config :distillery_example,
   ecto_repos: [Example.Repo]
