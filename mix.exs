@@ -20,7 +20,7 @@ defmodule Example.Mixfile do
   def application do
     [
       mod: {Example.Application, []},
-      extra_applications: [ :runtime_tools]
+      extra_applications: [:logger, :runtime_tools]
     ]
   end
 
