@@ -6,15 +6,6 @@
 use Mix.Config
 # Configures Elixir's Logger
 
-config :logger, :console,
-  format: "$time $metadata[$level] $message\n",
-  metadata: [:user_id]
-
-# Configures Elixir's Logger
-config :logger, :console,
-  format: "$time $metadata[$level] $message\n",
-  metadata: [:user_id]
-
 # General application configuration
 config :distillery_example,
   ecto_repos: [Example.Repo]
@@ -28,6 +19,11 @@ config :distillery_example, ExampleWeb.Endpoint,
            adapter: Phoenix.PubSub.PG2]
 
 config :phoenix, :json_library, Jason
+
+# Configures Elixir's Logger
+config :logger, :console,
+  format: "$time $metadata[$level] $message\n",
+  metadata: [:user_id]
 
 config :libcluster,
   topologies: [
