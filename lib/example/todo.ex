@@ -1,14 +1,13 @@
 defmodule Example.Todo do
   use Ecto.Schema
 
+  @derive {Jason.Encoder, except: [:__meta__]}
+
   schema "todos" do
     field :title, :string
     field :completed, :boolean
 
-    timestamps [
-      type: :naive_datetime,
-      autogenerate: {NaiveDateTime, :utc_now, []}
-    ]
+    timestamps()
   end
 
   @doc """
@@ -27,9 +26,9 @@ defmodule Example.Todo do
   @doc """
   Updates a Todo in the database 
   """
-  def update(params) do
+  def update(id, params) do
     result =
-      %__MODULE__{}
+      Example.Repo.get(__MODULE__, id)
       |> changeset(params)
       |> Example.Repo.update()
     case result do
