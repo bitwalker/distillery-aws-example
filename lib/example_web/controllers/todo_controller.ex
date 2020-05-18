@@ -43,8 +43,8 @@ defmodule ExampleWeb.TodoController do
       error(conn, Exception.message(err))
   end
 
-  def update(conn, params) do
-    case Example.Todo.update(params) do
+  def update(conn, %{"id" => id} = params) do
+    case Example.Todo.update(id, params) do
       {:ok, _} ->
         send_resp(conn, 200, "")
       {:error, reason} ->
